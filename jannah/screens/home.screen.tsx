@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 export default function HomeScreen() {
 
     const [text , setText] = useState('');
-    const [isRecording , setIsRecording] = useState(false);
+    const [isRecording , setIsRecording] = useState(false); //toggle enregistrement encours ou pas
     const [loading , setLoading] = useState(false);
     const [recording, setRecording] = useState <Audio.Recording> ();
     const [AIResponse, setAIResponse] = useState(false);
@@ -64,12 +64,27 @@ export default function HomeScreen() {
             setIsRecording(true)
             const {recordings} = await Audio.Recording.createAsync(recordingOptions) // cette ligne de code me permet de creer un enregistrement avec les options precedents
 
-            setRecording(recordings) //je stock le recording dans le state
+            setRecording(recordings) //je stock l'objet recording dans le state avec le mode d'enregistrement actif
         } catch (error) {
             console.log("failed to start recording", error)
             Alert.alert("Error", "failed to start recording")
         }
     }
+
+    const stopRecording = async () => {
+        try {
+            setIsRecording (false)
+            setLoading (true)
+            await recording?.stopAndUnloadAsync() //stopper l'enregistrement 
+            await Audio.setAudioModeAsync({
+                allowsRecordingIOS : false,
+                playsInSilentModeIOS : false,
+            })
+            const uri = recording.getURI() //recuperer l'uri de l'enregistrement
+        }
+    }
+
+
 
 
     }
